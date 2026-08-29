@@ -38,8 +38,8 @@ input:focus,select:focus{border-color:#5b6374}
 button{border:1px solid var(--line);border-radius:9px;background:#111722;color:var(--text);padding:10px 14px;font-size:14px;cursor:pointer}.statbuttons{display:flex;gap:8px}.status{font-size:11px;color:#697386}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding-bottom:50px}
 .card{position:relative;overflow:hidden;background:linear-gradient(145deg,#141925,#10141d);border:1px solid var(--line);border-radius:15px;padding:18px;min-height:190px;display:flex;flex-direction:column;gap:16px;transition:.18s}
-.map-bg{position:absolute;inset:-6%;background-image:linear-gradient(90deg,rgba(16,21,31,.10) 0%,rgba(16,21,31,.18) 20%,rgba(16,21,31,.48) 42%,rgba(16,21,31,.82) 62%,rgba(16,21,31,.98) 78%,rgba(16,21,31,1) 100%),var(--map-image);background-repeat:no-repeat;background-position:-20px center;background-size:cover;opacity:.46;filter:saturate(.78);pointer-events:none}
-.agent-bg{position:absolute;right:-18%;top:-7%;bottom:-7%;width:62%;background-image:var(--agent-image);background-repeat:no-repeat;background-position:right -18px bottom -56px;background-size:auto 125%;opacity:.64;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,transparent 0%,transparent 8%,rgba(0,0,0,.08) 20%,rgba(0,0,0,.38) 38%,rgba(0,0,0,.76) 58%,#000 78%);mask-image:linear-gradient(90deg,transparent 0%,transparent 8%,rgba(0,0,0,.08) 20%,rgba(0,0,0,.38) 38%,rgba(0,0,0,.76) 58%,#000 78%)}
+.map-bg{position:absolute;inset:-6%;background-image:linear-gradient(90deg,rgba(16,21,31,.10) 0%,rgba(16,21,31,.18) 20%,rgba(16,21,31,.48) 42%,rgba(16,21,31,.82) 62%,rgba(16,21,31,.98) 78%,rgba(16,21,31,1) 100%),var(--map-image-local);background-repeat:no-repeat;background-position:-20px center;background-size:cover;opacity:.46;filter:saturate(.78);pointer-events:none}
+.agent-bg{position:absolute;right:-18%;top:-7%;bottom:-7%;width:62%;background-image:var(--agent-image-local);background-repeat:no-repeat;background-position:right -18px bottom -56px;background-size:auto 125%;opacity:.64;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,transparent 0%,transparent 8%,rgba(0,0,0,.08) 20%,rgba(0,0,0,.38) 38%,rgba(0,0,0,.76) 58%,#000 78%);mask-image:linear-gradient(90deg,transparent 0%,transparent 8%,rgba(0,0,0,.08) 20%,rgba(0,0,0,.38) 38%,rgba(0,0,0,.76) 58%,#000 78%)}
 .action-watch:hover{background:#30405a}
 .card-link{display:block;color:inherit;text-decoration:none;cursor:pointer}
 .card-meta{position:relative;z-index:3;margin-top:auto;display:flex;align-items:center;gap:8px}
@@ -122,10 +122,12 @@ let lineups = [];
 let usingLiveSheet = false;
 let isLoading = true;
 
-const agentImages = {};
-const mapImages = {};
-const AGENT_API_URL = "https://valorant-api.com/v1/agents";
-const MAP_API_URL = "https://valorant-api.com/v1/maps";
+// V1.28 local-assets test: images are served exclusively from the uploaded GitHub assets.
+// Lookup keys are case-insensitive and punctuation-insensitive (KAY/O -> Kayo).
+const agentImages = {"BREACH": "assets/agents/Breach.png", "YORU": "assets/agents/Yoru.png", "VIPER": "assets/agents/Viper.png", "JETT": "assets/agents/Jett.png", "BRIMSTONE": "assets/agents/Brimstone.png", "KILLJOY": "assets/agents/Killjoy.png", "RAZE": "assets/agents/Raze.png", "SKYE": "assets/agents/Skye.png", "SOVA": "assets/agents/Sova.png", "CYPHER": "assets/agents/Cypher.png", "TEJO": "assets/agents/Tejo.png", "FADE": "assets/agents/Fade.png", "SAGE": "assets/agents/Sage.png", "OMEN": "assets/agents/Omen.png", "HARBOR": "assets/agents/Harbor.png", "MIKS": "assets/agents/Miks.png", "VETO": "assets/agents/Veto.png", "DEADLOCK": "assets/agents/Deadlock.png", "PHOENIX": "assets/agents/Phoenix.png", "CHAMBER": "assets/agents/Chamber.png", "REYNA": "assets/agents/Reyna.png", "NEON": "assets/agents/Neon.png", "ISO": "assets/agents/Iso.png", "KAYO": "assets/agents/Kayo.png", "CLOVE": "assets/agents/Clove.png", "GEKKO": "assets/agents/Gekko.png", "ASTRA": "assets/agents/Astra.png", "VYSE": "assets/agents/Vyse.png", "WAYLAY": "assets/agents/Waylay.png"};
+const mapImages = {"SUNSET": "assets/maps/Sunset.png", "FRACTURE": "assets/maps/Fracture.png", "ICEBOX": "assets/maps/Icebox.png", "HAVEN": "assets/maps/Haven.png", "SUMMIT": "assets/maps/Summit.png", "LOTUS": "assets/maps/Lotus.png", "ASCENT": "assets/maps/Ascent.png", "ABYSS": "assets/maps/Abyss.png", "SPLIT": "assets/maps/Split.png", "PEARL": "assets/maps/Pearl.png", "BIND": "assets/maps/Bind.png", "BREEZE": "assets/maps/Breeze.png", "CORRODE": "assets/maps/Corrode.png"};
+// V1.28 test: all agent and map imagery is loaded exclusively from local GitHub assets.
+const LOCAL_ASSET_BASE = "assets";
 function agentKey(name){
   return clean(name)
     .toUpperCase()
@@ -221,35 +223,10 @@ function toggleFilter(id){
   trigger.setAttribute("aria-expanded",String(willOpen));
 }
 
-async function loadAgentImages(){
-  try{
-    const response=await fetch(AGENT_API_URL + "?t=" + Date.now(), {cache:"no-store"});
-    if(!response.ok) throw new Error("Agent API returned HTTP " + response.status);
-    const payload=await response.json();
-    (payload.data || []).filter(agent=>agent.isPlayableCharacter !== false).forEach(agent=>{
-      const name=clean(agent.displayName).toUpperCase();
-      agentImages[agentKey(agent.displayName)]=agent.fullPortrait || agent.bustPortrait || agent.displayIcon || "";
-    });
-    render();
-  }catch(error){
-    console.warn("LarryLand: could not load agent portraits.", error);
-  }
-}
-
-async function loadMapImages(){
-  try{
-    const response=await fetch(MAP_API_URL + "?t=" + Date.now(), {cache:"no-store"});
-    if(!response.ok) throw new Error("Map API returned HTTP " + response.status);
-    const payload=await response.json();
-    (payload.data || []).forEach(map=>{
-      const name=mapKey(map.displayName);
-      const image=map.splash || map.displayIcon || "";
-      if(name && image) mapImages[name]=image;
-    });
-    render();
-  }catch(error){
-    console.warn("LarryLand: could not load map previews.", error);
-  }
+function agentImageSrc(name){ return agentImages[agentKey(name)] || ""; }
+function mapImageSrc(name){ return mapImages[mapKey(name)] || ""; }
+function loadLocalImages(){
+  // All agent/map images are bundled locally. No Valorant API is contacted.
 }
 
 function updateDependentFilters(){
@@ -305,7 +282,7 @@ function render(){
  $("grid").innerHTML=results.map(x=>{
    const link=clean(x.LINK);
    return link
-     ? `<a class="card card-link" href="${escAttr(link)}" target="_blank" rel="noopener noreferrer" style="--agent-image:url('${escAttr(agentImages[agentKey(x.AGENT)] || "")}');--map-image:url('${escAttr(mapImages[mapKey(x.MAP)] || "")}')">
+     ? `<a class="card card-link" href="${escAttr(link)}" target="_blank" rel="noopener noreferrer" style="--agent-image-local:url('${escAttr(agentImageSrc(x.AGENT))}');--map-image-local:url('${escAttr(mapImageSrc(x.MAP))}')">
          <div class="map-bg" aria-hidden="true"></div>
          <div class="agent-bg" aria-hidden="true"></div>
          <div class="card-content">
@@ -317,7 +294,7 @@ function render(){
            </div>
          </div>
        </a>`
-     : `<article class="card" style="--agent-image:url('${escAttr(agentImages[agentKey(x.AGENT)] || "")}');--map-image:url('${escAttr(mapImages[mapKey(x.MAP)] || "")}')">
+     : `<article class="card" style="--agent-image-local:url('${escAttr(agentImageSrc(x.AGENT))}');--map-image-local:url('${escAttr(mapImageSrc(x.MAP))}')">
          <div class="map-bg" aria-hidden="true"></div>
          <div class="agent-bg" aria-hidden="true"></div>
          <div class="card-content">
@@ -326,7 +303,7 @@ function render(){
            <div class="card-meta"><span class="card-side ${clean(x.SIDE).toUpperCase()==="ATT" ? "attack" : "defense"}">${esc(x.SIDE)}</span><span class="card-utility">${esc(x.UTILITY)}</span></div>
          </div>
        </article>`;
- }).join("") || `<div class="empty">No lineups are currently loaded.<br><br>Check the Google Sheet sharing settings, then click “Refresh data”.</div>`;
+  }).join("") || `<div class="empty">No lineups are currently loaded.<br><br>Check the Google Sheet sharing settings, then click “Refresh data”.</div>`;
 }
 
 function esc(v){return clean(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -374,7 +351,14 @@ function csvToLineups(text){
 async function loadSheet(){
   $("status").textContent=" · Updating…";
   try{
-    const response=await fetch(SHEET_API_URL + "?t=" + Date.now(), {cache:"no-store"});
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),15000);
+    let response;
+    try{
+      response=await fetch(SHEET_API_URL + "?t=" + Date.now(), {cache:"no-store",signal:controller.signal});
+    }finally{
+      clearTimeout(timeout);
+    }
     if(!response.ok) throw new Error("Google Sheets returned an error.");
     const text=await response.text();
     const fresh=JSON.parse(text);
@@ -394,6 +378,7 @@ async function loadSheet(){
     render();
   }catch(error){
     usingLiveSheet=false;
+    if(error && error.name === "AbortError") console.warn("LarryLand: Google Sheet request timed out after 15 seconds.");
     lineups=[];
     isLoading=false;
     $("status").textContent=" · Unable to connect to Google Sheet";
@@ -427,10 +412,11 @@ setOptions("map", optionValuesFor("MAP", lineups), "All Maps");
 updateDependentFilters();
 Object.keys(filterMeta).forEach(k=>$(filterMeta[k].trigger).textContent=displayFilterValue(k,filterState[k],filterMeta[k].label));
 
-// Load the latest Sheet data on page load, then check again every 5 minutes. Google Sheets is the only data source.
+// Load the latest Sheet data on page load, then check again every 5 minutes. Google Sheets is the only lineup-data source; local GitHub assets are the only image source.
+loadLocalImages();
+// Show the three-dot loader immediately while the Google Sheet is loading.
+render();
 loadSheet();
-loadAgentImages();
-loadMapImages();
 setInterval(loadSheet, 5*60*1000);
 </script>
 </body>
