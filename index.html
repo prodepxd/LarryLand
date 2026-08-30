@@ -88,6 +88,11 @@ footer{border-top:1px solid var(--line);padding:25px 0 40px;color:#686f7d;font-s
 .hover-marker.landing:after{transform:rotate(-45deg)}
 .hover-layout-label{position:absolute;left:10px;top:10px;z-index:4;padding:5px 9px;border-radius:6px;background:rgba(8,10,14,.82);color:#d9dee7;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;pointer-events:none}.hover-layout-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8e98aa;font-size:12px;font-weight:600;text-align:center;padding:20px;background:#0d121b}
 @media(max-width:560px){.hover-layout{padding:9px}.hover-marker.origin{width:6px;height:6px}.hover-marker.landing{width:9px;height:9px}.hover-marker.landing:before,.hover-marker.landing:after{left:3.5px;height:9px;width:2px}}
+/* V1.29.1 Test 1: touch devices use tap-to-preview instead of emulated hover. */
+@media (hover:none) and (pointer:coarse){
+  .card:hover .hover-layout{opacity:0;visibility:hidden}
+  .card.touch-preview .hover-layout{opacity:1;visibility:visible}
+}
 </style>
 
 
@@ -137,7 +142,7 @@ footer{border-top:1px solid var(--line);padding:25px 0 40px;color:#686f7d;font-s
 
 
 
-<footer><div class="container"><div>LarryLand v1.29 · I went into a custom so you don't have to</div>
+<footer><div class="container"><div>LarryLand v1.29.1 · I went into a custom so you don't have to</div>
 <div>LarryLand is not affiliated with or endorsed by Riot Games, Inc. VALORANT and all related assets are trademarks and/or copyrights of Riot Games, Inc.</div></div></footer>
 
 <script>
@@ -493,6 +498,51 @@ async function loadSheet(){
 ["map","agent","utility","side"].forEach(id=>{
   $(filterMeta[id].trigger).addEventListener("click",()=>toggleFilter(id));
 });
+
+// Touch interaction:
+// first tap previews the card, second tap follows its <a> link.
+// This is handled on click rather than pointerdown so normal touch scrolling
+// remains available when the user starts a gesture on a card.
+let lastTouchAt=0;
+
+function clearTouchPreview(){
+  document.querySelectorAll(".card.touch-preview").forEach(card=>card.classList.remove("touch-preview"));
+}
+
+$("grid").addEventListener("pointerdown",event=>{
+  if(event.pointerType!=="touch") return;
+  const card=event.target.closest(".card");
+  if(card) lastTouchAt=Date.now();
+});
+
+$("grid").addEventListener("click",event=>{
+  const card=event.target.closest(".card");
+  if(!card || !("ontouchstart" in window) || Date.now()-lastTouchAt>1500) return;
+
+  // Only <a> cards navigate. Non-link cards can still show the preview.
+  if(card.classList.contains("touch-preview")){
+    card.classList.remove("touch-preview");
+    return; // allow the second tap to follow the link
+  }
+
+  event.preventDefault();
+  clearTouchPreview();
+  card.classList.add("touch-preview");
+});
+
+$("grid").addEventListener("contextmenu",event=>{
+  // Suppress the long-press context menu caused by touch interaction,
+  // without disabling right-click context menus for mouse users.
+  if(Date.now()-lastTouchAt<2000) event.preventDefault();
+});
+
+window.addEventListener("scroll",()=>{
+  if(lastTouchAt){
+    clearTouchPreview();
+    lastTouchAt=0;
+  }
+},{passive:true});
+
 $("search").addEventListener("input",render);
 document.addEventListener("click",event=>{
   if(!event.target.closest(".filter-wrap")) closeFilterPopovers();
