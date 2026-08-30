@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <title>LarryLand</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310151f'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Arial,sans-serif' font-size='34' font-weight='900' fill='%23f2f4f7'%3EL%3C/text%3E%3C/svg%3E">
 <style>
 :root{--bg:#080a0e;--panel:#10151f;--panel2:#171d29;--text:#f2f4f7;--muted:#9299a8;--line:#293241;--accent:#c7cbd3;--accent2:#e0e3e8}
@@ -16,7 +17,7 @@
 header{padding:54px 0 30px;text-align:center}
 .logo{font-weight:900;letter-spacing:.12em;font-size:13px;color:var(--accent);text-transform:uppercase}
 h1{font-size:clamp(36px,6.4vw,66px);line-height:.95;margin:0;letter-spacing:-.055em;font-weight:900}.brand-lockup{display:inline-block}.brand-tagline{width:100%;margin-top:8px;text-align:center;font-size:clamp(16px,2.2vw,22px);line-height:1.1;font-weight:700;letter-spacing:.055em;color:#9ca5b5;white-space:nowrap}.subtitle-row{margin-top:10px;display:flex;align-items:center;justify-content:center;gap:12px}
-.subtitle{font-size:18px;font-weight:600;letter-spacing:.01em;color:#9ca5b5}
+.subtitle{font-size:18px;font-weight:600;letter-spacing:.01em;color:#9ca5b5}.admin-link{color:inherit;text-decoration:none;cursor:pointer}.admin-link:hover{text-decoration:underline}
 .socials{display:flex;align-items:center;gap:8px}
 .social{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #283344;border-radius:8px;background:#111722;color:#aeb6c4;text-decoration:none;transition:.18s}
 .social:hover{color:#f4f6f8;background:#182131;border-color:#3a4659;transform:translateY(-1px)}
@@ -41,6 +42,7 @@ button{border:1px solid var(--line);border-radius:9px;background:#111722;color:v
 .map-bg{position:absolute;inset:-6%;background-image:linear-gradient(90deg,rgba(16,21,31,.10) 0%,rgba(16,21,31,.18) 20%,rgba(16,21,31,.48) 42%,rgba(16,21,31,.82) 62%,rgba(16,21,31,.98) 78%,rgba(16,21,31,1) 100%),var(--map-image-local);background-repeat:no-repeat;background-position:-20px center;background-size:cover;opacity:.46;filter:saturate(.78);pointer-events:none}
 .agent-bg{position:absolute;right:-18%;top:-7%;bottom:-7%;width:62%;background-image:var(--agent-image-local);background-repeat:no-repeat;background-position:right -18px bottom -56px;background-size:auto 125%;opacity:.64;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,transparent 0%,transparent 8%,rgba(0,0,0,.08) 20%,rgba(0,0,0,.38) 38%,rgba(0,0,0,.76) 58%,#000 78%);mask-image:linear-gradient(90deg,transparent 0%,transparent 8%,rgba(0,0,0,.08) 20%,rgba(0,0,0,.38) 38%,rgba(0,0,0,.76) 58%,#000 78%)}
 .action-watch:hover{background:#30405a}
+
 .card-link{display:block;color:inherit;text-decoration:none;cursor:pointer}
 .card-meta{position:relative;z-index:3;margin-top:auto;display:flex;align-items:center;gap:8px}
 .card-side,.card-utility{height:40px;padding:0 18px;border-radius:8px;background:#273347;color:#f4f6f8;display:flex;align-items:center;justify-content:center;box-sizing:border-box;font-weight:700;font-size:14px}
@@ -71,6 +73,25 @@ footer{border-top:1px solid var(--line);padding:25px 0 40px;color:#686f7d;font-s
 
 /* V1.18 correction: map uses a full-card fade and agent uses a left-transparent mask to eliminate any hard image boundary. */
 </style>
+
+<style id="v129-test15-hover-layout">
+.hover-layout{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;padding:12px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease}
+.card:hover .hover-layout{opacity:1;visibility:visible}
+.hover-layout-inner{position:relative;width:100%;height:auto;aspect-ratio:16/10;max-height:100%;border-radius:10px;overflow:hidden;background:#0d121b;border:1px solid rgba(255,255,255,.10);box-shadow:0 12px 30px rgba(0,0,0,.32)}
+.hover-map-art{position:absolute;left:50%;top:50%;width:auto;height:100%;aspect-ratio:1/1;transform:translate(-50%,-50%);z-index:2;overflow:visible}.hover-map-zoom{position:absolute;width:100%;height:100%;transform-origin:0 0}.hover-layout-image{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0b1018}
+.hover-layout-shade{position:absolute;inset:0;background:rgba(8,10,14,.18);z-index:1}
+.hover-marker{position:absolute;transform:translate(-50%,-50%);z-index:4;pointer-events:none}
+.hover-marker.origin{width:7px;height:7px;border-radius:50%;background:#78e0a7;border:1px solid #f4fff8;box-shadow:0 0 0 1px rgba(120,224,167,.28),0 2px 5px rgba(0,0,0,.5)}
+.hover-marker.landing{width:10px;height:10px}
+.hover-marker.landing:before,.hover-marker.landing:after{content:"";position:absolute;left:4px;top:0;width:2px;height:10px;background:#ff3d5f;border-radius:1px;box-shadow:0 1px 4px rgba(0,0,0,.55)}
+.hover-marker.landing:before{transform:rotate(45deg)}
+.hover-marker.landing:after{transform:rotate(-45deg)}
+.hover-layout-label{position:absolute;left:10px;top:10px;z-index:4;padding:5px 9px;border-radius:6px;background:rgba(8,10,14,.82);color:#d9dee7;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;pointer-events:none}.hover-layout-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8e98aa;font-size:12px;font-weight:600;text-align:center;padding:20px;background:#0d121b}
+@media(max-width:560px){.hover-layout{padding:9px}.hover-marker.origin{width:6px;height:6px}.hover-marker.landing{width:9px;height:9px}.hover-marker.landing:before,.hover-marker.landing:after{left:3.5px;height:9px;width:2px}}
+</style>
+
+
+
 </head>
 <body>
 <header>
@@ -80,7 +101,7 @@ footer{border-top:1px solid var(--line);padding:25px 0 40px;color:#686f7d;font-s
 <div class="brand-tagline">One-Stop Elite Valorant Lineups</div>
 </div>
 <div class="subtitle-row">
-  <div class="subtitle">created by ProDep</div>
+  <div class="subtitle">created by <a class="admin-link" href="admin.html" id="adminLoginLink">ProDep</a></div>
   <div class="socials" aria-label="ProDep social links">
     <a class="social" href="https://www.twitch.tv/prodep" target="_blank" rel="noopener noreferrer" aria-label="ProDep on Twitch" title="Twitch">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2h18v13l-5 5h-4l-3 3v-3H4V2zm2 2v14h5v2.2l2.2-2.2H16l4-4V4H6zm3 3h2v6H9V7zm5 0h2v6h-2V7z"/></svg>
@@ -114,6 +135,8 @@ footer{border-top:1px solid var(--line);padding:25px 0 40px;color:#686f7d;font-s
 <div id="grid" class="grid"></div>
 </main>
 
+
+
 <footer><div class="container">LarryLand · I went into a custom so you don't have to</div></footer>
 
 <script>
@@ -128,6 +151,7 @@ const agentImages = {"BREACH": "assets/agents/Breach.png", "YORU": "assets/agent
 const mapImages = {"SUNSET": "assets/maps/Sunset.png", "FRACTURE": "assets/maps/Fracture.png", "ICEBOX": "assets/maps/Icebox.png", "HAVEN": "assets/maps/Haven.png", "SUMMIT": "assets/maps/Summit.png", "LOTUS": "assets/maps/Lotus.png", "ASCENT": "assets/maps/Ascent.png", "ABYSS": "assets/maps/Abyss.png", "SPLIT": "assets/maps/Split.png", "PEARL": "assets/maps/Pearl.png", "BIND": "assets/maps/Bind.png", "BREEZE": "assets/maps/Breeze.png", "CORRODE": "assets/maps/Corrode.png"};
 // V1.28 test: all agent and map imagery is loaded exclusively from local GitHub assets.
 const LOCAL_ASSET_BASE = "assets";
+const layoutImages = {"ABYSS": "assets/layouts/Abyss.png", "ASCENT": "assets/layouts/Ascent.png", "BIND": "assets/layouts/Bind.png", "BREEZE": "assets/layouts/Breeze.png", "CORRODE": "assets/layouts/Corrode.png", "FRACTURE": "assets/layouts/Fracture.png", "HAVEN": "assets/layouts/Haven.png", "ICEBOX": "assets/layouts/Icebox.png", "LOTUS": "assets/layouts/Lotus.png", "PEARL": "assets/layouts/Pearl.png", "SPLIT": "assets/layouts/Split.png", "SUMMIT": "assets/layouts/Summit.png", "SUNSET": "assets/layouts/Sunset.png"};
 function agentKey(name){
   return clean(name)
     .toUpperCase()
@@ -225,6 +249,7 @@ function toggleFilter(id){
 
 function agentImageSrc(name){ return agentImages[agentKey(name)] || ""; }
 function mapImageSrc(name){ return mapImages[mapKey(name)] || ""; }
+function layoutImageSrc(name){ return layoutImages[mapKey(name)] || ""; }
 function loadLocalImages(){
   // All agent/map images are bundled locally. No Valorant API is contacted.
 }
@@ -253,6 +278,78 @@ function updateDependentFilters(){
   setOptions("side", uniqueSides, "Attack + Defense");
 }
 
+
+function numericCoordinate(value){
+  const n=Number(value);
+  return Number.isFinite(n) && n>=0 && n<=100 ? n : null;
+}
+function layoutAssetPath(mapName){
+  const cleanName=clean(mapName);
+  if(!cleanName) return "";
+  return "assets/layouts/" + cleanName.replace(/\\/g,"/").split("/").pop() + ".png";
+}
+function mapImageSpaceCoordinate(value, axis){
+  const n=numericCoordinate(value);
+  if(n===null)return null;
+  // Admin stores coordinates in the 16:10 map-stage coordinate space.
+  // The actual square layout artwork is contain-fitted inside that stage,
+  // leaving horizontal letterbox space. Convert back onto the artwork.
+  const imageAspect=1;
+  const stageAspect=16/10;
+  if(axis==="x"){
+    const imageWidthPct=(imageAspect/stageAspect)*100; // 62.5%
+    const leftPad=(100-imageWidthPct)/2; // 18.75%
+    return Math.max(0,Math.min(100,(n-leftPad)/imageWidthPct*100));
+  }
+  return n;
+}
+function hoverLayoutMarkup(x){
+  const layout=layoutAssetPath(x.MAP);
+  const ox=mapImageSpaceCoordinate(x.ORIGIN_X,"x"), oy=mapImageSpaceCoordinate(x.ORIGIN_Y,"y");
+  const lx=mapImageSpaceCoordinate(x.LANDING_X,"x"), ly=mapImageSpaceCoordinate(x.LANDING_Y,"y");
+  if(!layout) return "";
+
+  const points=[];
+  if(ox!==null && oy!==null) points.push([ox,oy]);
+  if(lx!==null && ly!==null) points.push([lx,ly]);
+
+  const cx=points.length ? points.reduce((sum,p)=>sum+p[0],0)/points.length : 50;
+  const cy=points.length ? points.reduce((sum,p)=>sum+p[1],0)/points.length : 50;
+  const minX=points.length ? Math.min(...points.map(p=>p[0])) : 50;
+  const maxX=points.length ? Math.max(...points.map(p=>p[0])) : 50;
+  const minY=points.length ? Math.min(...points.map(p=>p[1])) : 50;
+  const maxY=points.length ? Math.max(...points.map(p=>p[1])) : 50;
+  const spanX=maxX-minX;
+  const spanY=maxY-minY;
+  const distance=Math.hypot(spanX,spanY);
+
+  /*
+   * Zoom is driven primarily by the distance between the two saved points:
+   * close points => tighter preview, far points => wider context.
+   *
+   * The second calculation is a hard safety limit so neither marker can ever
+   * be pushed outside the visible preview.
+   */
+  const desiredZoom=distance>0 ? 1 + 60/(distance+20) : 2.4;
+  const horizontalViewport=62.5;
+  const verticalViewport=100;
+  const fitZoomX=horizontalViewport/Math.max(1,spanX+8);
+  const fitZoomY=verticalViewport/Math.max(1,spanY+8);
+  const zoom=Math.max(1,Math.min(3.5,desiredZoom,fitZoomX,fitZoomY));
+
+  const width=100*zoom;
+  const height=100*zoom;
+  const left=50-cx*zoom;
+  const top=50-cy*zoom;
+  const zoomStyle=`width:${width}%;height:${height}%;left:${left}%;top:${top}%;transform:none;`;
+
+  const origin=(ox!==null && oy!==null)
+    ? `<span class="hover-marker origin" style="left:${ox}%;top:${oy}%" aria-label="Origin"></span>` : "";
+  const landing=(lx!==null && ly!==null)
+    ? `<span class="hover-marker landing" style="left:${lx}%;top:${ly}%" aria-label="Landing"></span>` : "";
+
+  return `<div class="hover-layout" aria-hidden="true"><div class="hover-layout-inner"><div class="hover-map-art"><div class="hover-map-zoom" style="${zoomStyle}"><img class="hover-layout-image" src="${escAttr(layout)}" alt="">${origin}${landing}</div></div><div class="hover-layout-shade"></div><span class="hover-layout-label">Map Preview</span></div></div>`;
+}
 function render(){
  if(isLoading){
    $("count").textContent="";
@@ -285,6 +382,7 @@ function render(){
      ? `<a class="card card-link" href="${escAttr(link)}" target="_blank" rel="noopener noreferrer" style="--agent-image-local:url('${escAttr(agentImageSrc(x.AGENT))}');--map-image-local:url('${escAttr(mapImageSrc(x.MAP))}')">
          <div class="map-bg" aria-hidden="true"></div>
          <div class="agent-bg" aria-hidden="true"></div>
+         ${hoverLayoutMarkup(x)}
          <div class="card-content">
            <div class="tags"><span class="tag">${esc(x.MAP)}</span><span class="tag">${esc(x.AGENT)}</span></div>
            <div class="name">${esc(x.NAME)}</div>
@@ -297,6 +395,7 @@ function render(){
      : `<article class="card" style="--agent-image-local:url('${escAttr(agentImageSrc(x.AGENT))}');--map-image-local:url('${escAttr(mapImageSrc(x.MAP))}')">
          <div class="map-bg" aria-hidden="true"></div>
          <div class="agent-bg" aria-hidden="true"></div>
+         ${hoverLayoutMarkup(x)}
          <div class="card-content">
            <div class="tags"><span class="tag">${esc(x.MAP)}</span><span class="tag">${esc(x.AGENT)}</span></div>
            <div class="name">${esc(x.NAME)}</div>
@@ -418,6 +517,50 @@ loadLocalImages();
 render();
 loadSheet();
 setInterval(loadSheet, 5*60*1000);
+
+const GOOGLE_CLIENT_ID="112605741964-sjcuf58seeojvbk5q8fvleim1jp2vg9o.apps.googleusercontent.com";
+let googleTokenClient=null;
+
+function openAdminLogin(e){
+  if(e)e.preventDefault();
+  if(!window.google || !google.accounts || !google.accounts.oauth2){
+    alert("Google Sign-In is still loading. Please try again in a moment.");
+    return;
+  }
+
+  googleTokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:GOOGLE_CLIENT_ID,
+    scope:"openid email profile",
+    callback:async(response)=>{
+      if(!response || !response.access_token){
+        alert("Google sign-in did not return an access token.");
+        return;
+      }
+
+      sessionStorage.setItem("larryland_google_token",response.access_token);
+      try{
+        const r=await fetch(SHEET_API_URL,{
+          method:"POST",
+          headers:{"Content-Type":"text/plain;charset=utf-8"},
+          body:JSON.stringify({action:"auth",access_token:response.access_token})
+        });
+        const result=await r.json();
+        if(!result.success)throw Error(result.error||"This Google account is not authorized.");
+        window.location.href="admin.html";
+      }catch(err){
+        sessionStorage.removeItem("larryland_google_token");
+        alert(err.message||"Access denied.");
+      }
+    }
+  });
+
+  // This call is made directly from the ProDep click so Google can open its
+  // native account chooser without an intermediate LarryLand login modal.
+  googleTokenClient.requestAccessToken({prompt:"select_account"});
+}
+
+$("adminLoginLink").addEventListener("click",openAdminLogin);
+
 </script>
 </body>
 </html>
